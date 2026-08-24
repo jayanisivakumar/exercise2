@@ -158,10 +158,10 @@ function main() {
     var imagedata = context.createImageData(w,h);
  
     // Define a rectangle in 2D with colors and coords at corners
-    var ulc = new Color(255,0,0,255); // upper left corner color: red
-    var urc = new Color(0,255,0,255); // upper right corner color: green
-    var llc = new Color(0,0,255,255); // lower left corner color: blue
-    var lrc = new Color(0,0,0,255); // lower right corner color: black
+    var ulc = new Color(0,255,255,255); // upper left corner color: cyan
+    var urc = new Color(255,0,255,255); // upper right corner color: magenta
+    var llc = new Color(255,255,0,255); // lower left corner color: yellow
+    var lrc = new Color(255, 192, 203, 255); // lower right corner color: pink
     var ulx = 50, uly = 50; // upper left corner position
     var urx = 200, ury = 50; // upper right corner position
     var llx = 50, lly = 150; // lower left corner position
@@ -190,6 +190,35 @@ function main() {
         lc.add(lcDelta);
         rc.add(rcDelta);
     } // end vertical
+
+    // Draw a triangle to the right of the rectangle
+    var triangleTopX = 300, triangleTopY = 50;
+    var triangleLeftX = 250, triangleRightX = 350, triangleBottomY = 150;
+    var triangleTopColor = new Color(0, 255, 255, 255);
+    var triangleLeftColor = new Color(255, 255, 0, 255);
+    var triangleRightColor = new Color(255, 192, 203, 255);
+
+    for (var triangleY=triangleTopY; triangleY<=triangleBottomY; triangleY++) {
+        var progress = (triangleY-triangleTopY) / (triangleBottomY-triangleTopY);
+        var startX = triangleTopX + (triangleLeftX-triangleTopX) * progress;
+        var endX = triangleTopX + (triangleRightX-triangleTopX) * progress;
+        var leftTriangleColor = triangleTopColor.clone().add(
+            triangleLeftColor.clone().subtract(triangleTopColor).scale(progress));
+        var rightTriangleColor = triangleTopColor.clone().add(
+            triangleRightColor.clone().subtract(triangleTopColor).scale(progress));
+        var triangleHorizontalColor = leftTriangleColor.clone();
+        var triangleColorDelta = rightTriangleColor.clone().subtract(leftTriangleColor);
+        var triangleWidth = endX - startX;
+
+        if (triangleWidth > 0) {
+            triangleColorDelta.scale(1 / triangleWidth);
+        }
+
+        for (var triangleX=Math.floor(startX); triangleX<=Math.floor(endX); triangleX++) {
+            drawPixel(imagedata,triangleX,triangleY,triangleHorizontalColor);
+            triangleHorizontalColor.add(triangleColorDelta);
+        }
+    }
     
     context.putImageData(imagedata, 0, 0); // display the image in the context
 }
